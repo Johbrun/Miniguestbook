@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+backend/dist/
+frontend/dist/
+
+# Runtime data (do not version the database, uploads or logs)
+backend/data/
+backend/uploads/
+backend/log.txt
+
+# Local environment files (the .env.example IS committed on purpose)
+.env
+*.local
+
+# Teacher-only material: nothing in here is meant for students
+_teacher/
+
+# Misc
+.DS_Store
+*.log
+coverage/
+sbom*.json
+*.sarif
+*_threatmodel*

@@ -1,0 +1,234 @@
+{
+  "version": "2.3.0",
+  "summary": {
+    "title": "MiniGuestbook — Threat Model",
+    "owner": "Équipe sécurité (TP)",
+    "description": "Modèle de menaces de départ pour le livre d'or du lycée. À compléter par les étudiants en Phase 1 (DFD + STRIDE). Ouvrir avec OWASP Threat Dragon.",
+    "id": 0
+  },
+  "detail": {
+    "contributors": [],
+    "diagramTop": 0,
+    "reviewer": "",
+    "threatTop": 0,
+    "diagrams": [
+      {
+        "id": 0,
+        "title": "Diagramme de flux principal",
+        "diagramType": "STRIDE",
+        "placeholder": "DFD de l'application",
+        "thumbnail": "./public/content/images/thumbnail.stride.jpg",
+        "version": "2.3.0",
+        "cells": [
+          {
+            "position": { "x": 40, "y": 240 },
+            "size": { "width": 120, "height": 70 },
+            "shape": "actor",
+            "id": "actor-visitor",
+            "zIndex": 1,
+            "data": {
+              "type": "tm.Actor",
+              "name": "Visiteur / Élève",
+              "description": "Utilisateur anonyme ou authentifié",
+              "outOfScope": false,
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "position": { "x": 300, "y": 240 },
+            "size": { "width": 130, "height": 70 },
+            "shape": "process",
+            "id": "proc-spa",
+            "zIndex": 2,
+            "data": {
+              "type": "tm.Process",
+              "name": "SPA React",
+              "description": "Application front servie par nginx",
+              "outOfScope": false,
+              "hasOpenThreats": true,
+              "threats": [
+                {
+                  "id": "threat-xss",
+                  "title": "XSS stockée via les messages",
+                  "type": "Tampering",
+                  "status": "Open",
+                  "severity": "High",
+                  "description": "Le contenu des messages est rendu sans échappement (dangerouslySetInnerHTML). Un attaquant injecte du JS exécuté chez les autres visiteurs.",
+                  "mitigation": "Échapper/assainir (sanitize-html, pas de dangerouslySetInnerHTML), CSP.",
+                  "modelType": "STRIDE"
+                }
+              ]
+            }
+          },
+          {
+            "position": { "x": 560, "y": 240 },
+            "size": { "width": 140, "height": 70 },
+            "shape": "process",
+            "id": "proc-api",
+            "zIndex": 3,
+            "data": {
+              "type": "tm.Process",
+              "name": "API Express",
+              "description": "Backend Node/Express (auth, messages, blog, profil, admin)",
+              "outOfScope": false,
+              "hasOpenThreats": true,
+              "threats": [
+                {
+                  "id": "threat-sqli",
+                  "title": "Injection SQL sur la recherche",
+                  "type": "Tampering",
+                  "status": "Open",
+                  "severity": "High",
+                  "description": "Le paramètre de recherche est concaténé dans la requête SQL ; erreurs verbeuses.",
+                  "mitigation": "Requêtes paramétrées ; messages d'erreur génériques.",
+                  "modelType": "STRIDE"
+                },
+                {
+                  "id": "threat-authz",
+                  "title": "Élévation de privilèges (mass assignment / token prévisible / IDOR)",
+                  "type": "Elevation of privilege",
+                  "status": "Open",
+                  "severity": "High",
+                  "description": "Champ role modifiable par le client, token = md5(pseudo), profils accessibles par IDOR.",
+                  "mitigation": "Liste blanche de champs, jetons aléatoires, contrôle d'accès serveur.",
+                  "modelType": "STRIDE"
+                }
+              ]
+            }
+          },
+          {
+            "position": { "x": 820, "y": 180 },
+            "size": { "width": 130, "height": 70 },
+            "shape": "store",
+            "id": "store-db",
+            "zIndex": 4,
+            "data": {
+              "type": "tm.Store",
+              "name": "SQLite",
+              "description": "users, messages, blog_posts, sessions",
+              "outOfScope": false,
+              "isALog": false,
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "position": { "x": 820, "y": 320 },
+            "size": { "width": 130, "height": 70 },
+            "shape": "store",
+            "id": "store-log",
+            "zIndex": 5,
+            "data": {
+              "type": "tm.Store",
+              "name": "log.txt",
+              "description": "Journal des actions",
+              "outOfScope": false,
+              "isALog": true,
+              "hasOpenThreats": true,
+              "threats": [
+                {
+                  "id": "threat-logcreds",
+                  "title": "Mots de passe en clair dans les logs",
+                  "type": "Information disclosure",
+                  "status": "Open",
+                  "severity": "Medium",
+                  "description": "Chaque tentative de login écrit le mot de passe en clair.",
+                  "mitigation": "Ne jamais journaliser de secret.",
+                  "modelType": "STRIDE"
+                }
+              ]
+            }
+          },
+          {
+            "position": { "x": 230, "y": 120 },
+            "size": { "width": 540, "height": 320 },
+            "angle": 0,
+            "shape": "trust-boundary-box",
+            "id": "tb-server",
+            "zIndex": 0,
+            "data": {
+              "type": "tm.Boundary",
+              "name": "Serveur (derrière le WAF)",
+              "description": "Périmètre serveur. Le WAF en amont est en DetectionOnly (ne bloque pas).",
+              "isTrustBoundary": true,
+              "hasOpenThreats": false
+            }
+          },
+          {
+            "shape": "flow",
+            "id": "flow-visitor-spa",
+            "zIndex": 10,
+            "source": { "cell": "actor-visitor" },
+            "target": { "cell": "proc-spa" },
+            "vertices": [],
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "HTTPS",
+              "description": "Navigation / formulaires",
+              "isEncrypted": false,
+              "protocol": "HTTPS",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "shape": "flow",
+            "id": "flow-spa-api",
+            "zIndex": 11,
+            "source": { "cell": "proc-spa" },
+            "target": { "cell": "proc-api" },
+            "vertices": [],
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "REST /api",
+              "description": "Appels API (JSON, cookie/Bearer)",
+              "isEncrypted": false,
+              "protocol": "HTTP",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "shape": "flow",
+            "id": "flow-api-db",
+            "zIndex": 12,
+            "source": { "cell": "proc-api" },
+            "target": { "cell": "store-db" },
+            "vertices": [],
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "SQL",
+              "description": "Lecture/écriture",
+              "isEncrypted": false,
+              "protocol": "SQL",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          },
+          {
+            "shape": "flow",
+            "id": "flow-api-log",
+            "zIndex": 13,
+            "source": { "cell": "proc-api" },
+            "target": { "cell": "store-log" },
+            "vertices": [],
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "append",
+              "description": "Écriture des événements",
+              "isEncrypted": false,
+              "protocol": "file",
+              "hasOpenThreats": false,
+              "threats": []
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+# MiniGuestbook — intentionally vulnerable lab stack.
+# Entry point is the Apache + ModSecurity WAF (running in DetectionOnly mode on purpose).
+services:
+  backend:
+    build: ./backend
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    volumes:
+      - backend_data:/app/data
+      - backend_uploads:/app/uploads
+    expose:
+      - "3001"
+
+  frontend:
+    build: ./frontend
+    expose:
+      - "80"
+    depends_on:
+      - backend
+
+  waf:
+    build: ./waf
+    ports:
+      - "8080:80"
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  backend_data:
+  backend_uploads:

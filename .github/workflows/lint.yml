@@ -1,0 +1,33 @@
+# Base CI (committed) — lint only.
+# The full security pipeline (SAST/SCA/secrets/container/IaC/SBOM/DAST) lives in the teacher bundle.
+name: Lint
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  lint:
+    name: ESLint + Prettier
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: ${{ matrix.project }}/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ${{ matrix.project }}
+        run: npm ci || npm install
+
+      - name: Run ESLint + Prettier
+        working-directory: ${{ matrix.project }}
+        run: npm run lint

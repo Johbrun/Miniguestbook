@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ----------------------------------------------------------------------------
+   Retro / Web 1.0 guestbook skin: parchment background, chunky beveled boxes,
+   playful fonts and saturated colors. Intentionally "vieillot".
+---------------------------------------------------------------------------- */
+
+@layer base {
+  html,
+  body,
+  #root {
+    @apply h-full;
+  }
+  body {
+    color: #3a2a18;
+    font-family: 'Trebuchet MS', Verdana, Geneva, Tahoma, sans-serif;
+    background-color: #f5e9c9;
+    /* tiled retro pattern: warm checker + dotted grid */
+    background-image:
+      radial-gradient(rgba(168, 85, 0, 0.12) 1.5px, transparent 1.5px),
+      linear-gradient(45deg, #f3e3bd 25%, transparent 25%, transparent 75%, #f3e3bd 75%),
+      linear-gradient(45deg, #f3e3bd 25%, transparent 25%, transparent 75%, #f3e3bd 75%);
+    background-size:
+      18px 18px,
+      40px 40px,
+      40px 40px;
+    background-position:
+      0 0,
+      0 0,
+      20px 20px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Pixelify Sans', cursive;
+    letter-spacing: 0.5px;
+  }
+
+  /* Classic hyperlink look */
+  a {
+    color: #1a3fbf;
+  }
+  a:visited {
+    color: #7a1fa2;
+  }
+}
+
+@layer components {
+  .card {
+    background: #fffdf5;
+    border: 3px double #b5651d;
+    border-radius: 6px;
+    padding: 1.25rem;
+    box-shadow: 4px 4px 0 rgba(181, 101, 29, 0.35);
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 text-sm font-bold;
+    padding: 0.45rem 0.9rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .btn-primary {
+    @apply btn;
+    color: #5d2c00;
+    background: linear-gradient(#ffd86b, #ff9d2f);
+    border: 2px outset #ffbf47;
+    text-shadow: 0 1px 0 #ffe9b0;
+  }
+  .btn-primary:hover {
+    background: linear-gradient(#ffe08a, #ffae52);
+  }
+  .btn-ghost {
+    @apply btn;
+    color: #3a2a18;
+    background: linear-gradient(#fdfbf2, #e9dcc0);
+    border: 2px outset #d8c79b;
+  }
+  .btn-ghost:hover {
+    background: linear-gradient(#fffdf5, #efe3c8);
+  }
+
+  .input {
+    @apply w-full text-sm;
+    color: #2a2118;
+    background: #fffef9;
+    border: 2px inset #c9a86a;
+    border-radius: 3px;
+    padding: 0.4rem 0.55rem;
+    outline: none;
+  }
+  .input:focus {
+    border-color: #b5651d;
+    background: #fffdf0;
+  }
+  .label {
+    @apply mb-1 block text-xs font-bold uppercase;
+    color: #8a5a2b;
+    letter-spacing: 0.5px;
+  }
+}

@@ -1,0 +1,28 @@
+# Base GitLab CI (committed) — lint only.
+# The full security pipeline is provided separately in the teacher bundle
+# (_teacher/gitlab-ci.security.yml) and can be included once activated.
+
+stages:
+  - lint
+
+.node_template:
+  image: node:20
+  before_script:
+    - cd "$PROJECT"
+    - npm ci || npm install
+
+lint:backend:
+  extends: .node_template
+  stage: lint
+  variables:
+    PROJECT: backend
+  script:
+    - npm run lint
+
+lint:frontend:
+  extends: .node_template
+  stage: lint
+  variables:
+    PROJECT: frontend
+  script:
+    - npm run lint

@@ -1,0 +1,12 @@
+# Lint + format staged files
+npx lint-staged
+
+# Secret scanning (shift-left). Best-effort: install gitleaks for full protection.
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks protect --staged --no-banner -v || {
+    echo "✖ gitleaks detected a secret in staged changes — commit blocked."
+    exit 1
+  }
+else
+  echo "ℹ gitleaks not installed — skipping secret scan (see README / Makefile)."
+fi
